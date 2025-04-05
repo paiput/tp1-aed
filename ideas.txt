@@ -1,0 +1,37 @@
+TAD: $Berratacoin
+
+usuarios: seq<Z>
+
+transaccion (tupla de 4 enteros): (id_transaccion: Z) x (id_comprador: Z) x (id_vendedor: Z) x (monto: Z)
+
+bloque:
+	- id: Entero no negativo
+	- seq<transaccion> (lim = 50), (id_transaccion estan ordenados -> como? asc: 1, 2, 3...?).
+
+bloque.transaccion[0] -> crea una 1 unidad de $Berratacoin.
+	- denominamos: "Transaccion de creacion";
+	- id_comprador = 0;
+	- id_vendedor = bloque.aleatorio();
+	- a partir del bloque 3000 (bloques[3000]) no hay mas money;
+
+
+----------------------------------------------------------------------------
+$Berretacoin
+	agregarBloque() -> agrega un bloque a la secuencia
+	maximosTenedores() -> devuelve LISTA (una secuencia) de los usuarios que tienen mayor cantidad de $Berretacoin.
+	montoMedio() -> promedio de transacciones (de todos los bloques? de un bloque?)
+	cotizacionAPesos(seq<cotizaciones: nose>) -> la lista de cotizaciones indica a cuantos pesos equivale un $Berretacoin, se pide devolver otra lista de la misma longitud que indique la cnatidad de total de pesos que representa la $Berretacoin en cada momento
+
+----------------------------------------------------------------------------
+DUDAS:
+	- cuantas transacciones por bloque se DEBEN hacer? o lo maneja el utilizador del TAD?
+	- que es la lista de cotizaciones, no entendi
+	- el TAD $Berratacoin
+
+---------------------------------------------------------------------------
+predefinimos bloque antes de arrancar la especificacion el TAD, en coloquio por asi decirlo
+bloque: Z x seq<(Z x Z x Z x Z)>
+
+TAD $Berretacoin {
+	obs: seq<bloque>
+}
