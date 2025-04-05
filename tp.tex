@@ -1,0 +1,69 @@
+\documentclass[10pt,a4paper]{article}
+
+\input{AEDmacros}
+\usepackage{caratula}
+
+\titulo{Trabajo Práctica 1}
+\subtitulo{Especificación de TADs}
+
+\fecha{\today}
+
+\materia{Materia de la carrera}
+\grupo{Grupo Almendra}
+
+\integrante{Apellido, Nombre1}{001/01}{email1@dominio.com}
+\integrante{Apellido, Nombre2}{002/01}{email2@dominio.com}
+\integrante{Apellido, Nombre3}{003/01}{email3@dominio.com}
+\integrante{Yu, Patricio}{1247/24}{yupatricio0@gmail.com}
+
+% Document
+\begin{document}
+\maketitle
+
+\section{Consideraciones}
+\subsection{Renombre de tipo: \textit{transaccion}}
+Por definicion del problema sabemos que una transaccion es una cuadru-pla que tiene la siguiente estructura:
+
+\vspace{0.3cm}
+\noindent
+\fbox{
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule} % Ajusta el ancho al texto
+        transaccion: $<$id\_transaccion: \ent, id\_comprador: \ent, id\_vendedor: \ent, monto: \ent$>$
+    \end{minipage}
+}
+\vspace{0.1cm}
+
+Lo que hacemos es un \textbf{renombre de tipo} para referirnos a esta cuadru-pla como un tipo \textcolor{red}{\textit{transaccion}}.
+
+\subsection{Renombre de tipo: \textit{bloque}}
+Un bloque tiene un \textit{id\_bloque} que se representa con un entero y puede tener hasta 50 \textit{transacciones}:
+
+\vspace{0.3cm}
+\noindent
+\fbox{
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule} % Ajusta el ancho al texto
+        bloque: $<$id\_bloque: \ent, transacciones: \TLista{transaccion}$>$
+    \end{minipage}
+}
+\vspace{0.1cm}
+
+Luego realizaremos un \textbf{renombre de tipo} para referirnos a esta du-pla como un tipo \textcolor{red}{\textit{bloque}}.
+
+\vspace{0.3cm}
+\noindent
+\fbox{
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule} % Ajusta el ancho al texto
+        TAD \$Berretacoin \{ \\
+        \null \qquad obs bloques: \TLista{bloque}
+        
+
+%        \begin{proc}{agregarBloque}{}{\ent \space \{}
+%            \requiere{True}
+%            \asegura{True}
+%        \end{proc}\}
+        
+        \}
+    \end{minipage}
+}
+
+\end{document}

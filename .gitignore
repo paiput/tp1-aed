@@ -3,6 +3,7 @@
 *.Rcheck/
 **/__pycache__/
 /out
+/.idea
 
 ########################
 # Archivos que NO ignora
