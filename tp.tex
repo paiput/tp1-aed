@@ -50,19 +50,20 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero y puede t
 Luego realizaremos un \textbf{renombre de tipo} para referirnos a esta du-pla como un tipo \textcolor{red}{\textit{bloque}}.
 
 \vspace{0.3cm}
+
 \noindent
 \fbox{
-    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule} % Ajusta el ancho al texto
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
         TAD \$Berretacoin \{ \\
-        \null \qquad obs bloques: \TLista{bloque}
-        
+        \null \qquad obs bloques: \TLista{bloque} \\
+        \null \qquad obs usuarios: \TLista{usuario}
 
-%        \begin{proc}{agregarBloque}{}{\ent \space \{}
-%            \requiere{True}
-%            \asegura{True}
-%        \end{proc}\}
-        
-        \}
+        \setlength{\leftskip}{2em} \begin{proc}{agregarBloque}{}{\ent \space \{}
+            \requiere{True}
+            \asegura{True}
+        \end{proc}\}
+
+        \setlength{\leftskip}{0pt}\}
     \end{minipage}
 }
 

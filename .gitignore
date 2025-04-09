@@ -4,6 +4,7 @@
 **/__pycache__/
 /out
 /.idea
+/auxil
 
 ########################
 # Archivos que NO ignora
