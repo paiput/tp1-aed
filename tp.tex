@@ -17,13 +17,13 @@
 \integrante{Apellido, Nombre3}{003/01}{email3@dominio.com}
 \integrante{Yu, Patricio}{1247/24}{yupatricio0@gmail.com}
 
-% Document
 \begin{document}
 \maketitle
 
-% --------------------RENOMBRES------------------------
+% -------------------- RENOMBRES ------------------------ %
 \section{Renombres de tipo}
 En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{strutcs}} para una mejor legibilidad de la especificacion a lo largo del documento.
+% ----- usuario -----------------------------------------
 \subsection{Tipo: \textit{usuario}}
 El usuario consta de un \textit{id\_usuario} y una cantidad de \textit{cant\_berretacoin}, ambos enteros positivos, realizaremos el siguiente renombre de tipo:
 
@@ -36,6 +36,7 @@ El usuario consta de un \textit{id\_usuario} y una cantidad de \textit{cant\_ber
 }
 \vspace{0.1cm}
 
+% ----- transaccion -------------------------------------
 \subsection{Tipo: \textit{transaccion}}
 Por definicion del problema sabemos que una transaccion es una cuadru-pla que consta de un \textit{id\_transaccion}, \textit{id\_comprador}, \textit{id\_vendedor}, \textit{monto}, todos enteros positivos, realizaremos el siguiente renombre de tipo:
 
@@ -48,6 +49,7 @@ Por definicion del problema sabemos que una transaccion es una cuadru-pla que co
 }
 \vspace{0.1cm}
 
+% ----- bloque ------------------------------------------
 \subsection{Tipo: \textit{bloque}}
 Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo y puede tener hasta 50 \textit{transacciones}:
 
@@ -60,6 +62,7 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
 }
 \vspace{0.1cm}
 
+% ------------------------- TAD -------------------------- %
 \section{Definicion del TAD}
 \noindent
 \fbox{
@@ -69,41 +72,53 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         TAD Berretacoin \{ \\
         \qquad obs bloques: \TLista{bloque} \\
         \qquad obs usuarios: \TLista{usuario} \\
-        % ----------------PROCEDIMIENTOS----------------
+        % ---------------- PROCEDIMIENTOS ---------------- %
         \setlength{\leftskip}{2em}
+        % ----- contructor -------------------------------
         \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((esEnteroPositivo(usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i].id\_usuario))\yLuego (usuarios[i].cant\_berretacoin = 0))}}
+            \requiere{|usuarios| \ge 1}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((esMayorACero(usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].cant\_berretacoin = 0))}}
             \asegura{res.bloques = \big[ \ \big]}
-            \asegura{res.usuarios = usuarios \ \land \ |usuarios| \ge 1}
+            \asegura{res.usuarios = usuarios}
         \end{proc} \}
         \vspace{0.3em}
+        % ----- agregarUsuario ---------------------------
         \begin{proc}{agregarUsuario}{\Inout{berretacoin: Berretacoin}, \In{u: usuario}}{}
-            % se puede hacer la comparacion usuario \in berretacoin.usuarios? tipo, compara los structs? o como funcionaria el pertenece en este caso, porque berretacoin.usuarios es una secuencia de structs, como actuaria el pertenece en este caso?
             \requiere{berretacoin = B_{0}}
             \requiere{nuevoUsuarioValido(B_{0}.usuarios, u)}
             \asegura{berretacoin.usuarios = B_{0}.usuarios \text{ ++ } u}
         \end{proc} \}
         \vspace{0.3em}
+        % ----- agregarBloque ----------------------------
         \begin{proc}{agregarBloque}{}{\ent}
             \requiere{True}
             \asegura{True}
         \end{proc} \} \par
         \vspace{0.5em}
-        % ----------------PREDICADOS----------------
-        \pred{hayRepetidos}{s: \TLista{T}, e: T}{
-            \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i] = e, 1, 0)\right) \ge 2
+        \begin{proc}{maximosTenedores}{\In berretacoin: Berretacoin}{\TLista{usuario}}
+            \asegura{\paraTodo[unalinea]{u}{berretacoin.usuarios}{(u \in res) \iff (esMaximoTenedor(berretacoin.usuarios, u))}}
+        \end{proc} \} \par
+        \vspace{0.5em}
+        % ---------------- PREDICADOS ---------------- %
+        % ----- hayRepetidos -------------------------
+        \pred{hayRepetidos}{s: \TLista{usuario}, u: usuario}{
+            \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i].id\_usuario = u.id\_usuario, 1, 0)\right) \ge 2
         }
         \vspace{0.5em}
-
-        \pred{esEnteroPositivo}{n: \ent}{
-            \qquad\quad x \ge 0
+        % ----- esMayorACero -------------------------
+        \pred{esMayorACero}{n: \ent}{
+            \qquad\quad x > 0
         }
         \vspace{0.5em}
-
+        % ----- nuevoUsuarioValido -------------------
         \pred{nuevoUsuarioValido}{s: \TLista{usuario}, u: usuario}{
             \qquad\quad (u.cant\_berretacoin = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (s[i].id\_usuario \neq u.id\_usuario)})
         }
-
+        \vspace{0.5em}
+        \pred{esMaximoTenedor}{s: \TLista{usuario}, u: usuario}{
+            \qquad\quad \paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (u.cant\_berretacoin \ge s[i].cant\_berretacoin)}
+        }
+        % ---------------- AUXILIARES ---------------- %
         \setlength{\leftskip}{0pt}\}
         \vspace{0.2cm}
     \end{minipage}
