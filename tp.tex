@@ -65,23 +65,27 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
         \raggedright
         \vspace{0.2cm}
-        TAD \$Berretacoin \{ \\
-        \null \qquad obs bloques: \TLista{bloque} \\
-        \null \qquad obs usuarios: \TLista{usuario}
-
+        TAD Berretacoin \{ \\
+        \qquad obs bloques: \TLista{bloque} \\
+        \qquad obs usuarios: \TLista{usuario} \\
         % ----------------PROCEDIMIENTOS----------------
         \setlength{\leftskip}{2em}
-        \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin \space \{}
+        \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
             \asegura{res.bloques = \big[ \ \big]}
             \asegura{res.usuarios = usuarios \ \land \ |usuarios| \ge 1}
             \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |res.usuarios|) \implicaLuego (res.usuarios[i].cant\_berretacoin = 0)}}
             \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |res.usuarios|) \implicaLuego (esEnteroPositivo(res.usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(res.usuarios,\ res.usuarios[i].id\_usuario))}}
         \end{proc} \}
-        \vspace{0.5em}
-        \begin{proc}{agregarBloque}{}{\ent \space \{}
+        \vspace{0.3em}
+        \begin{proc}{agregarUsuario}{\Inout{berretacoin: Berretacoin}, \In{u: usuario}}{}
+
+        \end{proc} \}
+        \vspace{0.3em}
+        \begin{proc}{agregarBloque}{}{\ent}
             \requiere{True}
             \asegura{True}
-        \end{proc} \} \\[0.5em]
+        \end{proc} \} \par
+        \vspace{0.5em}
         % ----------------PREDICADOS----------------
         \pred{hayRepetidos}{s: \TLista{T}, e: T}{
             \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i] = e, 1, 0)\right) \ge 2
