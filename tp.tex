@@ -4,12 +4,12 @@
 \usepackage{caratula}
 \usepackage{hyperref}
 
-\titulo{Trabajo Práctica 1}
+\titulo{Trabajo Práctico 1}
 \subtitulo{Especificación de TADs}
 
 \fecha{\today}
 
-\materia{Materia de la carrera}
+\materia{AED}
 \grupo{Grupo Almendra}
 
 \integrante{Apellido, Nombre1}{001/01}{email1@dominio.com}
@@ -21,6 +21,7 @@
 \begin{document}
 \maketitle
 
+% --------------------RENOMBRES------------------------
 \section{Renombres de tipo}
 En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{strutcs}} para una mejor legibilidad de la especificacion a lo largo del documento.
 \subsection{Tipo: \textit{usuario}}
@@ -71,14 +72,16 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         % ----------------PROCEDIMIENTOS----------------
         \setlength{\leftskip}{2em}
         \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((esEnteroPositivo(usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i].id\_usuario))\yLuego (usuarios[i].cant\_berretacoin = 0))}}
             \asegura{res.bloques = \big[ \ \big]}
             \asegura{res.usuarios = usuarios \ \land \ |usuarios| \ge 1}
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |res.usuarios|) \implicaLuego (res.usuarios[i].cant\_berretacoin = 0)}}
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |res.usuarios|) \implicaLuego (esEnteroPositivo(res.usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(res.usuarios,\ res.usuarios[i].id\_usuario))}}
         \end{proc} \}
         \vspace{0.3em}
         \begin{proc}{agregarUsuario}{\Inout{berretacoin: Berretacoin}, \In{u: usuario}}{}
-
+            % se puede hacer la comparacion usuario \in berretacoin.usuarios? tipo, compara los structs? o como funcionaria el pertenece en este caso, porque berretacoin.usuarios es una secuencia de structs, como actuaria el pertenece en este caso?
+            \requiere{berretacoin = B_{0}}
+            \requiere{nuevoUsuarioValido(B_{0}.usuarios, u)}
+            \asegura{berretacoin.usuarios = B_{0}.usuarios \text{ ++ } u}
         \end{proc} \}
         \vspace{0.3em}
         \begin{proc}{agregarBloque}{}{\ent}
@@ -91,9 +94,16 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
             \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i] = e, 1, 0)\right) \ge 2
         }
         \vspace{0.5em}
+
         \pred{esEnteroPositivo}{n: \ent}{
             \qquad\quad x \ge 0
         }
+        \vspace{0.5em}
+
+        \pred{nuevoUsuarioValido}{s: \TLista{usuario}, u: usuario}{
+            \qquad\quad (u.cant\_berretacoin = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (s[i].id\_usuario \neq u.id\_usuario)})
+        }
+
         \setlength{\leftskip}{0pt}\}
         \vspace{0.2cm}
     \end{minipage}
