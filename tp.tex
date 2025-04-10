@@ -2,6 +2,7 @@
 
 \input{AEDmacros}
 \usepackage{caratula}
+\usepackage{hyperref}
 
 \titulo{Trabajo Práctica 1}
 \subtitulo{Especificación de TADs}
@@ -20,50 +21,77 @@
 \begin{document}
 \maketitle
 
-\section{Consideraciones}
-\subsection{Renombre de tipo: \textit{transaccion}}
-Por definicion del problema sabemos que una transaccion es una cuadru-pla que tiene la siguiente estructura:
+\section{Renombres de tipo}
+En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{strutcs}} para una mejor legibilidad de la especificacion a lo largo del documento.
+\subsection{Tipo: \textit{usuario}}
+El usuario consta de un \textit{id\_usuario} y una cantidad de \textit{cant\_berretacoin}, ambos enteros positivos, realizaremos el siguiente renombre de tipo:
 
 \vspace{0.3cm}
-\noindent
-\fbox{
-    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule} % Ajusta el ancho al texto
-        transaccion: $<$id\_transaccion: \ent, id\_comprador: \ent, id\_vendedor: \ent, monto: \ent$>$
-    \end{minipage}
-}
-\vspace{0.1cm}
-
-Lo que hacemos es un \textbf{renombre de tipo} para referirnos a esta cuadru-pla como un tipo \textcolor{red}{\textit{transaccion}}.
-
-\subsection{Renombre de tipo: \textit{bloque}}
-Un bloque tiene un \textit{id\_bloque} que se representa con un entero y puede tener hasta 50 \textit{transacciones}:
-
-\vspace{0.3cm}
-\noindent
-\fbox{
-    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule} % Ajusta el ancho al texto
-        bloque: $<$id\_bloque: \ent, transacciones: \TLista{transaccion}$>$
-    \end{minipage}
-}
-\vspace{0.1cm}
-
-Luego realizaremos un \textbf{renombre de tipo} para referirnos a esta du-pla como un tipo \textcolor{red}{\textit{bloque}}.
-
-\vspace{0.3cm}
-
 \noindent
 \fbox{
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+        \textit{usuario} \textbf{ES} struct$<$id\_usuario: \ent, cant\_berretacoin: \ent$>$
+    \end{minipage}
+}
+\vspace{0.1cm}
+
+\subsection{Tipo: \textit{transaccion}}
+Por definicion del problema sabemos que una transaccion es una cuadru-pla que consta de un \textit{id\_transaccion}, \textit{id\_comprador}, \textit{id\_vendedor}, \textit{monto}, todos enteros positivos, realizaremos el siguiente renombre de tipo:
+
+\vspace{0.3cm}
+\noindent
+\fbox{
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+        \textit{transaccion} \textbf{ES} struct$<$id\_transaccion: \ent, id\_comprador: \ent, id\_vendedor: \ent, monto: \ent$>$
+    \end{minipage}
+}
+\vspace{0.1cm}
+
+\subsection{Tipo: \textit{bloque}}
+Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo y puede tener hasta 50 \textit{transacciones}:
+
+\vspace{0.3cm}
+\noindent
+\fbox{
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+        \textit{bloque} \textbf{ES} struct$<$id\_bloque: \ent, transacciones: \TLista{transaccion}$>$
+    \end{minipage}
+}
+\vspace{0.1cm}
+
+\section{Definicion del TAD}
+\noindent
+\fbox{
+    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+        \raggedright
+        \vspace{0.2cm}
         TAD \$Berretacoin \{ \\
         \null \qquad obs bloques: \TLista{bloque} \\
         \null \qquad obs usuarios: \TLista{usuario}
 
-        \setlength{\leftskip}{2em} \begin{proc}{agregarBloque}{}{\ent \space \{}
+        % ----------------PROCEDIMIENTOS----------------
+        \setlength{\leftskip}{2em}
+        \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin \space \{}
+            \asegura{res.bloques = \big[ \ \big]}
+            \asegura{res.usuarios = usuarios \ \land \ |usuarios| \ge 1}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |res.usuarios|) \implicaLuego (res.usuarios[i].cant\_berretacoin = 0)}}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |res.usuarios|) \implicaLuego (esEnteroPositivo(res.usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(res.usuarios,\ res.usuarios[i].id\_usuario))}}
+        \end{proc} \}
+        \vspace{0.5em}
+        \begin{proc}{agregarBloque}{}{\ent \space \{}
             \requiere{True}
             \asegura{True}
-        \end{proc}\}
-
+        \end{proc} \} \\[0.5em]
+        % ----------------PREDICADOS----------------
+        \pred{hayRepetidos}{s: \TLista{T}, e: T}{
+            \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i] = e, 1, 0)\right) \ge 2
+        }
+        \vspace{0.5em}
+        \pred{esEnteroPositivo}{n: \ent}{
+            \qquad\quad x \ge 0
+        }
         \setlength{\leftskip}{0pt}\}
+        \vspace{0.2cm}
     \end{minipage}
 }
 
