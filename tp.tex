@@ -22,7 +22,7 @@
 
 % -------------------- RENOMBRES ------------------------ %
 \section{Renombres de tipo}
-En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{strutcs}} para una mejor legibilidad de la especificacion a lo largo del documento.
+En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{structs}} para una mejor legibilidad de la especificacion a lo largo del documento.
 % ----- usuario -----------------------------------------
 \subsection{Tipo: \textit{usuario}}
 El usuario consta de un \textit{id} y una cantidad de \textit{monedas}, ambos enteros positivos, realizaremos el siguiente renombre de tipo:
@@ -86,14 +86,16 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         \begin{proc}{agregarUsuario}{\Inout{berretacoin: Berretacoin}, \In{u: usuario}}{}
             \requiere{berretacoin = B_{0}}
             \requiere{nuevoUsuarioValido(B_{0}.usuarios, u)}
-            \asegura{berretacoin.usuarios = B_{0}.usuarios \text{ ++ } u}
             \asegura{berretacoin.bloques = B_{0}.bloques}
+            \asegura{berretacoin.usuarios = B_{0}.usuarios \text{ ++ } u}
         \end{proc} \}
         \vspace{0.3em}
         % ----- agregarBloque ----------------------------
         \begin{proc}{agregarBloque}{\Inout berretacoin: Berretacoin}{\ent}
             \requiere{berretacoin = B_{0}}
-            \asegura{(|B_{0}.bloques| \le 3000) \implicaLuego (\existe[unalinea]{i}{\ent}{(0 \le i < |B_{0}.usuarios|) \implicaLuego (berretacoin.usuarios[i].monedas = B_{0}.usuarios[i].monedas + 1)\yLuego (berretacoin.bloques = B_{0}.bloques \text{ ++ }\langle |B_{0}.bloques| + 1, \langle 1, B_{0}.usuarios[i].id, 0 \rangle\rangle)})}
+            \asegura{berretacoin.usuarios = B_{0}.usuarios}
+            \asegura{(|B_{0}.bloques| \le 3000) \implicaLuego (\existe[unalinea]{i}{\ent}{(0 \le i < |B_{0}.usuarios|) \implicaLuego (berretacoin.usuarios[i].monedas = B_{0}.usuarios[i].monedas + 1)\yLuego (berretacoin.bloques = B_{0}.bloques \text{ ++ }\langle |B_{0}.bloques| + 1,\langle\rangle \text{ ++ } \langle 1, 0, B_{0}.usuarios[i].id, 1 \rangle\rangle)})}
+            \asegura{\text{falta completar la version si ya pasaron los primeros 3000 bloques, la parte sencilla}}
         \end{proc} \} \par
         \vspace{0.5em}
         \begin{proc}{maximosTenedores}{\In berretacoin: Berretacoin}{\TLista{usuario}}

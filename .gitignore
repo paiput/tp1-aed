@@ -2,7 +2,6 @@
 !*/
 *.Rcheck/
 **/__pycache__/
-/out
 /.idea
 /auxil
 
