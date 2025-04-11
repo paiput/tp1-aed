@@ -25,13 +25,13 @@
 En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{strutcs}} para una mejor legibilidad de la especificacion a lo largo del documento.
 % ----- usuario -----------------------------------------
 \subsection{Tipo: \textit{usuario}}
-El usuario consta de un \textit{id\_usuario} y una cantidad de \textit{cant\_berretacoin}, ambos enteros positivos, realizaremos el siguiente renombre de tipo:
+El usuario consta de un \textit{id} y una cantidad de \textit{monedas}, ambos enteros positivos, realizaremos el siguiente renombre de tipo:
 
 \vspace{0.3cm}
 \noindent
 \fbox{
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
-        \textit{usuario} \textbf{ES} struct$<$id\_usuario: \ent, cant\_berretacoin: \ent$>$
+        \textit{usuario} \textbf{ES} struct \langle id: \ent, monedas: \ent\rangle
     \end{minipage}
 }
 \vspace{0.1cm}
@@ -44,7 +44,7 @@ Por definicion del problema sabemos que una transaccion es una cuadru-pla que co
 \noindent
 \fbox{
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
-        \textit{transaccion} \textbf{ES} struct$<$id\_transaccion: \ent, id\_comprador: \ent, id\_vendedor: \ent, monto: \ent$>$
+        \textit{transaccion} \textbf{ES} struct \langle id\_transaccion: \ent, id\_comprador: \ent, id\_vendedor: \ent, monto: \ent\rangle
     \end{minipage}
 }
 \vspace{0.1cm}
@@ -57,7 +57,7 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
 \noindent
 \fbox{
     \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
-        \textit{bloque} \textbf{ES} struct$<$id\_bloque: \ent, transacciones: \TLista{transaccion}$>$
+        \textit{bloque} \textbf{ES} struct \langle id\_bloque: \ent, transacciones: \TLista{transaccion}\rangle
     \end{minipage}
 }
 \vspace{0.1cm}
@@ -77,7 +77,7 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         % ----- contructor -------------------------------
         \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
             \requiere{|usuarios| \ge 1}
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((esMayorACero(usuarios[i].id\_usuario))\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].cant\_berretacoin = 0))}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((esMayorACero(usuarios[i].id))\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].monedas = 0))}}
             \asegura{res.bloques = \big[ \ \big]}
             \asegura{res.usuarios = usuarios}
         \end{proc} \}
@@ -87,12 +87,13 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
             \requiere{berretacoin = B_{0}}
             \requiere{nuevoUsuarioValido(B_{0}.usuarios, u)}
             \asegura{berretacoin.usuarios = B_{0}.usuarios \text{ ++ } u}
+            \asegura{berretacoin.bloques = B_{0}.bloques}
         \end{proc} \}
         \vspace{0.3em}
         % ----- agregarBloque ----------------------------
-        \begin{proc}{agregarBloque}{}{\ent}
-            \requiere{True}
-            \asegura{True}
+        \begin{proc}{agregarBloque}{\Inout berretacoin: Berretacoin}{\ent}
+            \requiere{berretacoin = B_{0}}
+            \asegura{(|B_{0}.bloques| \le 3000) \implicaLuego (\existe[unalinea]{i}{\ent}{(0 \le i < |B_{0}.usuarios|) \implicaLuego (berretacoin.usuarios[i].monedas = B_{0}.usuarios[i].monedas + 1)\yLuego (berretacoin.bloques = B_{0}.bloques \text{ ++ }\langle |B_{0}.bloques| + 1, \langle 1, B_{0}.usuarios[i].id, 0 \rangle\rangle)})}
         \end{proc} \} \par
         \vspace{0.5em}
         \begin{proc}{maximosTenedores}{\In berretacoin: Berretacoin}{\TLista{usuario}}
@@ -102,7 +103,7 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         % ---------------- PREDICADOS ---------------- %
         % ----- hayRepetidos -------------------------
         \pred{hayRepetidos}{s: \TLista{usuario}, u: usuario}{
-            \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i].id\_usuario = u.id\_usuario, 1, 0)\right) \ge 2
+            \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i].id = u.id, 1, 0)\right) \ge 2
         }
         \vspace{0.5em}
         % ----- esMayorACero -------------------------
@@ -112,11 +113,11 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         \vspace{0.5em}
         % ----- nuevoUsuarioValido -------------------
         \pred{nuevoUsuarioValido}{s: \TLista{usuario}, u: usuario}{
-            \qquad\quad (u.cant\_berretacoin = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (s[i].id\_usuario \neq u.id\_usuario)})
+            \qquad\quad (u.monedas = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (s[i].id \neq u.id)})
         }
         \vspace{0.5em}
         \pred{esMaximoTenedor}{s: \TLista{usuario}, u: usuario}{
-            \qquad\quad \paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (u.cant\_berretacoin \ge s[i].cant\_berretacoin)}
+            \qquad\quad \paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (u.monedas \ge s[i].monedas)}
         }
         % ---------------- AUXILIARES ---------------- %
         \setlength{\leftskip}{0pt}\}
