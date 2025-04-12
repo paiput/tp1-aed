@@ -14,7 +14,7 @@
 
 \integrante{Apellido, Nombre1}{001/01}{email1@dominio.com}
 \integrante{Apellido, Nombre2}{002/01}{email2@dominio.com}
-\integrante{Apellido, Nombre3}{003/01}{email3@dominio.com}
+\integrante{Piputto, Lucas Ignacio}{1345/24}{lucaspiputto@gmail.com}
 \integrante{Yu, Patricio}{1247/24}{yupatricio0@gmail.com}
 
 \begin{document}
@@ -49,18 +49,13 @@ Por definicion del problema sabemos que una transaccion es una cuadru-pla que co
 }
 \vspace{0.1cm}
 
-% ----- bloque ------------------------------------------
-\subsection{Tipo: \textit{bloque}}
-Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo y puede tener hasta 50 \textit{transacciones}:
+% -------------------- CONSIDERACIONES ------------------------ %
+\section{Consideraciones}
+% ----- bloques -----------------------------------------------
+\subsection{\textit{bloques}}
+Un bloque es una secuencia de \textit{transaccion}, esta ultima tiene un limite de hasta 50 posibles transacciones, y por lo tanto \textit{bloques} no es mas que una \TLista{\TLista{transaccion}}, y de esta manera los subindices de \textit{bloques} representan el \textit{id} de cada \textit{bloque}, que por enunciado sabemos que son enteros positivos secuenciales.
 
 \vspace{0.3cm}
-\noindent
-\fbox{
-    \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
-        \textit{bloque} \textbf{ES} struct \langle id\_bloque: \ent, transacciones: \TLista{transaccion}\rangle
-    \end{minipage}
-}
-\vspace{0.1cm}
 
 % ------------------------- TAD -------------------------- %
 \section{Definicion del TAD}
@@ -70,32 +65,25 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         \raggedright
         \vspace{0.2cm}
         TAD Berretacoin \{ \\
-        \qquad obs bloques: \TLista{bloque} \\
+        \qquad obs bloques: \TLista{\TLista{transaccion}} \\
         \qquad obs usuarios: \TLista{usuario} \\
         % ---------------- PROCEDIMIENTOS ---------------- %
         \setlength{\leftskip}{2em}
-        % ----- contructor -------------------------------
+        % ----- constructor -------------------------------
         \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
             \requiere{|usuarios| \ge 1}
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((esMayorACero(usuarios[i].id))\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].monedas = 0))}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego (usuarios[i].id > 0)\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].monedas = 0))}}
             \asegura{res.bloques = \big[ \ \big]}
             \asegura{res.usuarios = usuarios}
         \end{proc} \}
         \vspace{0.3em}
-        % ----- agregarUsuario ---------------------------
-        \begin{proc}{agregarUsuario}{\Inout{berretacoin: Berretacoin}, \In{u: usuario}}{}
-            \requiere{berretacoin = B_{0}}
-            \requiere{nuevoUsuarioValido(B_{0}.usuarios, u)}
-            \asegura{berretacoin.bloques = B_{0}.bloques}
-            \asegura{berretacoin.usuarios = B_{0}.usuarios \text{ ++ } u}
-        \end{proc} \}
-        \vspace{0.3em}
         % ----- agregarBloque ----------------------------
-        \begin{proc}{agregarBloque}{\Inout berretacoin: Berretacoin}{\ent}
+        \begin{proc}{agregarBloque}{\Inout berretacoin: Berretacoin, \In t: \TLista{transaccion}}{\ent}
             \requiere{berretacoin = B_{0}}
+            \requiere{|t| \le 50}
             \asegura{berretacoin.usuarios = B_{0}.usuarios}
-            \asegura{(|B_{0}.bloques| \le 3000) \implicaLuego (\existe[unalinea]{i}{\ent}{(0 \le i < |B_{0}.usuarios|) \implicaLuego (berretacoin.usuarios[i].monedas = B_{0}.usuarios[i].monedas + 1)\yLuego (berretacoin.bloques = B_{0}.bloques \text{ ++ }\langle |B_{0}.bloques| + 1,\langle\rangle \text{ ++ } \langle 1, 0, B_{0}.usuarios[i].id, 1 \rangle\rangle)})}
-            \asegura{\text{falta completar la version si ya pasaron los primeros 3000 bloques, la parte sencilla}}
+            \asegura{(|B_{0}.bloques| \le 3000) \implicaLuego (\existe[unalinea]{i}{\ent}{(0 \le i < |B_{0}.usuarios|) \implicaLuego ((berretacoin.usuarios[i].monedas = B_{0}.usuarios[i].monedas + 1)\yLuego (berretacoin.bloques = B_{0}.bloques \text{ ++ } (t \text{ ++ } \langle \textit{id\_transaccion: } 1,\ \textit{id\_comprador: } 0,\ \textit{id\_vendedor: } B_{0}.usuarios[i].id,\ \textit{monto: } 1 \rangle)))})}
+            \asegura{(|B_{0}.bloques| > 3000) \implicaLuego (berretacoin.bloques = B_{0}.bloques \text{ ++ } t)}
         \end{proc} \} \par
         \vspace{0.5em}
         \begin{proc}{maximosTenedores}{\In berretacoin: Berretacoin}{\TLista{usuario}}
@@ -106,11 +94,6 @@ Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo 
         % ----- hayRepetidos -------------------------
         \pred{hayRepetidos}{s: \TLista{usuario}, u: usuario}{
             \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i].id = u.id, 1, 0)\right) \ge 2
-        }
-        \vspace{0.5em}
-        % ----- esMayorACero -------------------------
-        \pred{esMayorACero}{n: \ent}{
-            \qquad\quad x > 0
         }
         \vspace{0.5em}
         % ----- nuevoUsuarioValido -------------------
