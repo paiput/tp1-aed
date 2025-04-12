@@ -4,6 +4,7 @@
 **/__pycache__/
 /.idea
 /auxil
+.vscode
 
 ########################
 # Archivos que NO ignora
@@ -38,4 +39,4 @@
 !Makefile
 !.keep
 !.gitignore
-.vscode
+!notas_paiput.pdf
