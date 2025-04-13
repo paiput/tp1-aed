@@ -116,7 +116,7 @@
             \textbf{\textcolor{blue}{(}}\paraTodo[unalinea]{j}{\ent}{
                 ((0 \le j < |transacciones|) \land ((b.usuarios[i].id = transacciones[k].id\_comprador) \lor (b.usuarios[i].id = transacciones[k].id\_vendedor)) \implicaLuego
                 \textbf{\textcolor{red}{(}}
-                (ifThenElse(existiaUsuario(B_{0}.usuarios,\ b.usuarios[i].id),\ B_{0}.usuarios[i].monto,\ 0) + montoRecibido(transacciones,\ usuarios[i],\ j) - montoGastado(transacciones,\ usuarios[i].id,\ j)) \ge 0\textbf{\textcolor{red}{)}}}\textbf{\textcolor{blue}{)}}}
+                (ifThenElse(existiaUsuario(B_{0}.usuarios,\ b.usuarios[i].id),\ B_{0}.usuarios[i].monto,\ 0) + montoRecibido(transacciones,\ usuarios[i],\ j) - montoGastado(transacciones,\ usuarios[i],\ j)) \ge 0\textbf{\textcolor{red}{)}}}\textbf{\textcolor{blue}{)}}}
             }
             \requiere{
                 (|B_{0}.bloques| \le 3000) \implicaLuego
@@ -136,7 +136,8 @@
         \end{proc} \} \par
         \vspace{0.5em}
 
-        \begin{proc}{montoMedio}{\In b: Berretacoin}{\TLista{\float}}
+        \begin{proc}{montoMedio}{\In b: Berretacoin}{\float}
+            \requiere{True}
             \asegura{res = 0 \iff |b.bloques| = 0}
             \asegura{res = 
                 \big(montoTotalOperadoBloques(b.bloques) \big)
@@ -149,8 +150,8 @@
         \begin{proc}{cotizacionAPesos}{\In cotizaciones: \TLista{\ent}}{\TLista{\ent}}
             \requiere{ |cotizaciones| = |b.bloques| }
             \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] > 0)}}
-            \asegura{|cotizaciones| = |b.bloques|}
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] * montoTotalOperado(bloque.transacciones) \in res)}}
+            \asegura{ |res| = |cotizaciones| }
+            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (res[i] = cotizaciones[i] * montoTotalOperado(bloques[i].transacciones))}}
         \end{proc} \} \par
         \vspace{0.5em}
 
@@ -192,12 +193,12 @@
         \vspace{0.5em}
 
         \aux{montoTotalOperadoBloques}{bloques: \TLista{bloque}}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id \leq 3000, 1, 0),
+            \\ \qquad\quad \left(\sum_{k=0}^{|bloques| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id \leq 3000, 1, 0),
                 \\ \qquad\qquad\qquad b.bloques[k].transacciones))\Big)}
         \vspace{0.5em}
 
         \aux{cantTotalDeOperacionesBloques}{bloques: \TLista{bloque}}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} |b.bloques[k].transacciones| - ifThenElse(b.bloques[k].id \leq 3000, 1, 0)\right)}
+            \\ \qquad\quad \left(\sum_{k=0}^{|bloques| - 1} |b.bloques[k].transacciones| - ifThenElse(b.bloques[k].id \leq 3000, 1, 0)\right)}
         \vspace{0.5em}
 
         \aux{transaccionesDesde}{indice: \ent, transacciones: \TLista{transaccion}}{\TLista{transaccion}}{
