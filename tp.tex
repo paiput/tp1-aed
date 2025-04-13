@@ -192,7 +192,8 @@
         \vspace{0.5em}
 
         \aux{montoTotalOperadoBloques}{bloques: \TLista{bloque}}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id \leq 3000, 1, 0), b.bloques[k].transacciones))\right)}
+            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id \leq 3000, 1, 0),
+                \\ \qquad\qquad\qquad b.bloques[k].transacciones))\Big)}
         \vspace{0.5em}
 
         \aux{cantTotalDeOperacionesBloques}{bloques: \TLista{bloque}}{\ent}{
