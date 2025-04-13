@@ -33,6 +33,7 @@
 ## Texto
 !*.md
 !*.txt
+!*.pdf
 
 ## Otros
 !makefile
