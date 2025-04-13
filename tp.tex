@@ -136,6 +136,16 @@
         \end{proc} \} \par
         \vspace{0.5em}
 
+        \begin{proc}{montoMedio}{\In b: Berretacoin}{\TLista{\float}}
+            \asegura{res = 0 \iff |b.bloques| = 0}
+            \asegura{res = 
+                \big(montoTotalOperadoBloques(b.bloques) \big)
+                /
+                \big(cantTotalDeOperacionesBloques(b.bloques) \big)
+            }
+        \end{proc} \} \par
+        \vspace{0.5em}
+
         \begin{proc}{cotizacionAPesos}{\In cotizaciones: \TLista{\ent}}{\TLista{\ent}}
             \requiere{ |cotizaciones| = |b.bloques| }
             \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] > 0)}}
@@ -179,6 +189,18 @@
 
         \aux{montoTotalOperado}{transacciones: \TLista{transaccion}}{\ent}{
             \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} transacciones[k].monto\right)}
+        \vspace{0.5em}
+
+        \aux{montoTotalOperadoBloques}{bloques: \TLista{bloque}}{\ent}{
+            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id \leq 3000, 1, 0), b.bloques[k].transacciones))\right)}
+        \vspace{0.5em}
+
+        \aux{cantTotalDeOperacionesBloques}{bloques: \TLista{bloque}}{\ent}{
+            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} |b.bloques[k].transacciones| - ifThenElse(b.bloques[k].id \leq 3000, 1, 0)\right)}
+        \vspace{0.5em}
+
+        \aux{transaccionesDesde}{indice: \ent, transacciones: \TLista{transaccion}}{\TLista{transaccion}}{
+            \\ \qquad\quad \left(subseq(transacciones, indice, |transacciones|)\right)}
 
         \setlength{\leftskip}{0pt}\}
         \vspace{0.2cm}
