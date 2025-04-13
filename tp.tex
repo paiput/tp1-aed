@@ -136,6 +136,14 @@
         \end{proc} \} \par
         \vspace{0.5em}
 
+        \begin{proc}{cotizacionAPesos}{\In cotizaciones: \TLista{\ent}}{\TLista{\ent}}
+            \requiere{ |cotizaciones| = |b.bloques| }
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] > 0)}}
+            \asegura{|cotizaciones| = |b.bloques|}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] * montoTotalOperado(bloque.transacciones) \in res)}}
+        \end{proc} \} \par
+        \vspace{0.5em}
+
         \pred{hayRepetidos}{s: \TLista{usuario}, u: usuario}{
             \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i].id = u.id,\ 1,\ 0)\right) \ge 2
         }
@@ -167,6 +175,10 @@
 
         \aux{montoGastado}{transacciones: \TLista{transaccion}, u: usuario, idx: \ent}{\ent}{
             \\ \qquad\quad \left(\sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_comprador = u.id,\ transacciones[j].monto,\ 0)\right)}
+        \vspace{0.5em}
+
+        \aux{montoTotalOperado}{transacciones: \TLista{transaccion}}{\ent}{
+            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} transacciones[k].monto\right)}
 
         \setlength{\leftskip}{0pt}\}
         \vspace{0.2cm}
