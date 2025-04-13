@@ -2,6 +2,9 @@
 !*/
 *.Rcheck/
 **/__pycache__/
+/.idea
+/auxil
+.vscode
 
 ########################
 # Archivos que NO ignora
@@ -36,3 +39,4 @@
 !Makefile
 !.keep
 !.gitignore
+!notas_paiput.pdf

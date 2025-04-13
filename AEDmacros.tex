@@ -29,9 +29,14 @@
 	\
 	% Ponemos los parametros
 	(#3)%
-	\ifthenelse{\equal{#4}{}}{}{%
-		% Por ultimo, va el tipo del resultado
-		\ : #4}
+	\ifthenelse{\equal{#4}{}}
+	{
+		\{
+	}
+	% Por ultimo, va el tipo del resultado
+	{
+		: #4 \{
+	}
 }
 
 \newenvironment{proc}[4][res]{%
@@ -121,9 +126,9 @@
 \newcommand{\Iff}{\ensuremath{\leftrightarrow}}
 \newcommand{\implica}{\ensuremath{\longrightarrow}}
 \newcommand{\IfThenElse}[3]{\ensuremath{\mathsf{if}\ #1\ \mathsf{then}\ #2\ \mathsf{else}\ #3\ \mathsf{fi}}}
-\newcommand{\yLuego}{\land _L}
+\newcommand{\yLuego}{\land_L}
 \newcommand{\oLuego}{\lor _L}
-\newcommand{\implicaLuego}{\implica _L}
+\newcommand{\implicaLuego}{\implica_L}
 
 \newcommand{\cuantificador}[5]{%
 	\ensuremath{(#2 #3: #4)\ (%

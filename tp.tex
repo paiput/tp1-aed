@@ -1,0 +1,187 @@
+\documentclass[10pt,a4paper]{article}
+
+\input{AEDmacros}
+\usepackage{caratula}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+
+\titulo{Trabajo Práctico 1}
+\subtitulo{Especificación de TADs}
+
+\fecha{\today}
+
+\materia{AED}
+\grupo{Grupo Almendra}
+
+\integrante{Puodziunas, Bruno}{309/23}{puodziunasb@gmail.com}
+\integrante{Ozzan Prieto, Luana Constanza}{1444/23}{luanaozzan@gmail.com}
+\integrante{Piputto, Lucas Ignacio}{1345/24}{lucaspiputto@gmail.com}
+\integrante{Yu, Patricio}{1247/24}{yupatricio0@gmail.com}
+
+\begin{document}
+    \maketitle
+
+% -------------------- RENOMBRES ------------------------ %
+    \section{Renombres de tipo}
+    En lugar de \textcolor{red}{\textit{tuplas}} utilizaremos \textcolor{red}{\textit{structs}} para una mejor legibilidad de la especificacion a lo largo del documento.
+
+% ----- usuario -----------------------------------------
+    \subsection{Tipo: \textit{usuario}}
+    El usuario consta de un \textit{id} y una cantidad de \textit{monedas}, ambos enteros positivos, realizaremos el siguiente renombre de tipo:
+
+    \vspace{0.3cm}
+    \noindent
+    \fbox{
+        \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+            \textit{usuario} \textbf{ES} struct \langle id: \ent, monedas: \ent\rangle
+        \end{minipage}
+    }
+    \vspace{0.1cm}
+
+% ----- transaccion -------------------------------------
+    \subsection{Tipo: \textit{transaccion}}
+    Por definicion del problema sabemos que una transaccion es una cuadru-pla que consta de un \textit{id\_transaccion}, \textit{id\_comprador}, \textit{id\_vendedor}, \textit{monto}, todos enteros positivos, realizaremos el siguiente renombre de tipo:
+
+    \vspace{0.3cm}
+    \noindent
+    \fbox{
+        \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+            \textit{transaccion} \textbf{ES} struct \langle id\_transaccion: \ent, id\_comprador: \ent, id\_vendedor: \ent, monto: \ent\rangle
+        \end{minipage}
+    }
+    \vspace{0.1cm}
+
+% ----- bloque ------------------------------------------
+    \subsection{Tipo: \textit{bloque}}
+    Un bloque tiene un \textit{id\_bloque} que se representa con un entero positivo y puede tener hasta 50 \textit{transacciones}:
+
+    \vspace{0.3cm}
+    \noindent
+    \fbox{
+        \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule}
+            \textit{bloque} \textbf{ES} struct \langle id\_bloque: \ent, transacciones: \TLista{transaccion}\rangle
+        \end{minipage}
+    }
+    \vspace{0.1cm}
+
+% ------------------------- TAD -------------------------- %
+    \newpage
+    \section{Definicion del TAD}
+    \begin{tcolorbox}[
+        breakable,
+        enhanced,
+        boxrule=0.8pt,
+        arc=0pt,
+        outer arc=0pt,
+        left=3pt,
+        right=3pt,
+        top=3pt,
+        bottom=3pt,
+        colback=white,
+        colframe=black,
+        width=\dimexpr\textwidth-2\fboxsep-2\fboxrule,
+        before skip=0.3cm,
+        after skip=0.1cm
+    ]
+        \raggedright
+        \vspace{0.2cm}
+        TAD Berretacoin \{ \\
+        \qquad obs bloques: \TLista{bloque} \\
+        \qquad obs usuarios: \TLista{usuario} \\
+
+        \setlength{\leftskip}{2em}
+
+        \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
+            \requiere{|usuarios| \ge 1}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((usuarios[i].id > 0)\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].monedas = 0))}}
+            \asegura{res.bloques = \langle\rangle}
+            \asegura{res.usuarios = usuarios}
+        \end{proc} \}
+        \vspace{0.3em}
+
+        \begin{proc}{agregarBloque}{\Inout b: Berretacoin, \In transacciones: \TLista{transaccion}}{}
+            \requiere{b = B_{0}}
+            \requiere{|transacciones| \le 50}
+            \requiere{((transacciones[0].id = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones| - 1) \implicaLuego (transacciones[i].id + 1 = transacciones[i+1].id)})) \lor (transacciones = \langle\rangle)}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \implicaLuego (transacciones[i].id\_comprador \neq transacciones[i].id\_vendedor)}}
+            \requiere{
+                \paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \implicaLuego
+                \textbf{\textcolor{blue}{(}}(\lnot existiaUsuario(B_{0},\ transacciones[i].comprador)) \implicaLuego
+                \textbf{\textcolor{red}{(}}\existe[unalinea]{j}{\ent}{(0 \le j < i) \implicaLuego
+                \textbf{\textcolor{brown}{(}}transacciones[i].comprador = transacciones[j].vendedor\textbf{\textcolor{brown}{)}}}\textbf{\textcolor{red}{)}}\textbf{\textcolor{blue}{)}}}
+            }
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |b.usuario|) \implicaLuego
+            \textbf{\textcolor{blue}{(}}\paraTodo[unalinea]{j}{\ent}{
+                ((0 \le j < |transacciones|) \land ((b.usuarios[i].id = transacciones[k].id\_comprador) \lor (b.usuarios[i].id = transacciones[k].id\_vendedor)) \implicaLuego
+                \textbf{\textcolor{red}{(}}
+                (ifThenElse(existiaUsuario(B_{0}.usuarios,\ b.usuarios[i].id),\ B_{0}.usuarios[i].monto,\ 0) + montoRecibido(transacciones,\ usuarios[i],\ j) - montoGastado(transacciones,\ usuarios[i].id,\ j)) \ge 0\textbf{\textcolor{red}{)}}}\textbf{\textcolor{blue}{)}}}
+            }
+            \requiere{
+                (|B_{0}.bloques| \le 3000) \implicaLuego
+                \textbf{\textcolor{blue}{(}}
+                (|transacciones| > 0) \land
+                (transacciones[0].monto = 1) \land
+                (noGanoMonedaGratis(B_{0}.bloques, transacciones[0].id\_vendedor)) \land
+                (\paraTodo[unalinea]{i}{\ent}{(1 \le i < |transacciones|) \implicaLuego (transacciones[i].comprador\_id \neq 0)}) \textbf{\textcolor{blue}{)}}
+            }
+            \requiere{(|B_{0}.bloques| > 3000) \implicaLuego (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \implicaLuego (transacciones[i].comprador\_id \neq 0)})}
+            \asegura{True}
+        \end{proc} \} \par
+        \vspace{0.5em}
+
+        \begin{proc}{maximosTenedores}{\In b: Berretacoin}{\TLista{usuario}}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |b|) \implicaLuego ((b.usuarios[i] \in res) \iff (esMaximoTenedor(b.usuarios, b.usuarios[i])))}}
+        \end{proc} \} \par
+        \vspace{0.5em}
+
+        \begin{proc}{cotizacionAPesos}{\In cotizaciones: \TLista{\ent}}{\TLista{\ent}}
+            \requiere{ |cotizaciones| = |b.bloques| }
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] > 0)}}
+            \asegura{|cotizaciones| = |b.bloques|}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] * montoTotalOperado(bloque.transacciones) \in res)}}
+        \end{proc} \} \par
+        \vspace{0.5em}
+
+        \pred{hayRepetidos}{s: \TLista{usuario}, u: usuario}{
+            \qquad\quad \left(\sum_{i = 0}^{|s| - 1} ifThenElseFi(s[i].id = u.id,\ 1,\ 0)\right) \ge 2
+        }
+        \vspace{0.5em}
+
+        \pred{nuevoUsuarioValido}{s: \TLista{usuario}, u: usuario}{
+            \qquad\quad (u.monedas = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (s[i].id \neq u.id)})
+        }
+        \vspace{0.5em}
+
+        \pred{esMaximoTenedor}{s: \TLista{usuario}, u: usuario}{
+            \qquad\quad \paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (u.monedas \ge s[i].monedas)}
+        }
+        \vspace{0.5em}
+
+        \pred{existiaUsuario}{s: \TLista{usuario}, id\_u: \ent}{
+            \qquad\quad \existe[unalinea]{i}{\ent}{(0 \le i < |s|) \land_{l} (s[i].id = id\_u)}
+        }
+        \vspace{0.5em}
+
+        \pred{noGanoMonedaGratis}{bloques: \TLista{bloque}, id\_vendedor: \ent}{
+            \qquad\quad \existe[unalinea]{i}{\ent}{(0 \le i < |bloques|) \implicaLuego (bloques[i].transacciones[0].vendedor \neq id\_vendedor)}
+        }
+        \vspace{0.5em}
+
+        \aux{montoRecibido}{transacciones: \TLista{transaccion}, u: usuario, idx: \ent}{\ent}{
+            \\ \qquad\quad \left(\sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_vendedor = u.id,\ transacciones[j].monto,\ 0)\right)}
+        \vspace{0.5em}
+
+        \aux{montoGastado}{transacciones: \TLista{transaccion}, u: usuario, idx: \ent}{\ent}{
+            \\ \qquad\quad \left(\sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_comprador = u.id,\ transacciones[j].monto,\ 0)\right)}
+        \vspace{0.5em}
+
+        \aux{montoTotalOperado}{transacciones: \TLista{transaccion}}{\ent}{
+            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} transacciones[k].monto\right)}
+
+        \setlength{\leftskip}{0pt}\}
+        \vspace{0.2cm}
+    \end{tcolorbox}
+
+\end{document}
