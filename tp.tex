@@ -138,7 +138,8 @@
 
         \begin{proc}{montoMedio}{\In b: Berretacoin}{\float}
             \requiere{True}
-            \asegura{res = 0 \iff |b.bloques| = 0}
+            \asegura{|b.bloques| = 0 \implicaLuego res = 0}
+            \asegura{cantTotalDeOperacionesBloques(b.bloques) = 0 \implicaLuego res = 0}
             \asegura{res = 
                 \big(montoTotalOperadoBloques(b.bloques) \big)
                 /
