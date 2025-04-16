@@ -135,11 +135,11 @@
             \requiere{
                 (|B_{0}.bloques| \le 3000) \implicaLuego \textbf{\textcolor{blue}{(}} \\
                 \setlength{\leftskip}{8em}
-                (|transacciones| > 0)\ \land_L \\
+                $(|transacciones| > 0)\ \land_L \\
                 (transacciones[0].id\_comprador = 0)\ \land_L \\
                 (transacciones[0].monto = 1)\ \land_L \\
                 (noGanoMonedaGratis(B_{0}.bloques, transacciones[0].id\_vendedor))\ \land_L \\
-                (\paraTodo[unalinea]{i}{\ent}{(1 \le i < |transacciones|) \implicaLuego ((transacciones[i].comprador\_id \neq 0) \land_L
+                (\paraTodo[unalinea]{i}{\ent}{(1 \le i < |transacciones|) \implicaLuego ((transacciones[i].comprador\_id \neq 0) \land_L$
                     \\ \qquad (transacciones[i].vendedor\_id \neq 0)))}\\
                 \textbf{\textcolor{blue}{)}}
                 \\
