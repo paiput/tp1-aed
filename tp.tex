@@ -102,7 +102,7 @@
         \setlength{\leftskip}{2em}
 
         \begin{proc}{nuevoBerretacoin}{\In{usuarios: \TLista{usuario}}}{Berretacoin}
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |usuarios|) \implicaLuego ((usuarios[i].id > 0)\yLuego \lnot (hayRepetidos(usuarios,\ usuarios[i]))\yLuego (usuarios[i].monedas = 0))}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |usuarios| \implicaLuego (usuarios[i].id > 0\yLuego \lnot hayRepetidos(usuarios,\ usuarios[i])\yLuego usuarios[i].monedas = 0)}}
             \asegura{res.bloques = \langle\rangle}
             \textcolor{babyblue}{/* Se crea el usuario de id 0 en la primera posición de la lista de usuarios y se le concatena la lista de usuarios recibida */} \\
             \asegura{res.usuarios = \langle\langle id: 0,\ monedas: 3000 \rangle \rangle \text{ ++ } usuarios}
@@ -113,71 +113,74 @@
             \textcolor{babyblue}{/* Cantidad limite de transacciones = 50 */} \\
             \requiere{|transacciones| \le 50}
             \textcolor{babyblue}{/* Los ids de las transacciones son consecutivos arrancando desde el 0, sino no tiene transacciones */} \\
-            \requiere{((transacciones[0].id = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones| - 1) \implicaLuego (transacciones[i].id + 1 = transacciones[i+1].id)})) \lor (transacciones = \langle\rangle)}
+            \requiere{transacciones = \langle\rangle \oLuego (transacciones[0].id = 0 \land \paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| - 1 \implicaLuego transacciones[i].id + 1 = transacciones[i+1].id})}
             \textcolor{babyblue}{/* Un usuario no puede ser comprador y vendedor a la vez en la misma transacción */} \\
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \implicaLuego (transacciones[i].id\_comprador \neq transacciones[i].id\_vendedor)}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| \implicaLuego transacciones[i].id\_comprador \neq transacciones[i].id\_vendedor}}
             \textcolor{babyblue}{/* Si en transacciones aparece un comprador que no era usuario, el mismo debe aparecer como vendedor en alguna transacción previa*/} \\
             \requiere{
-                \paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \implicaLuego
-                \textbf{\textcolor{blue}{(}}(\lnot perteneceUsuario(b.usuarios,\ transacciones[i].id\_comprador)) \implicaLuego
-                \textbf{\textcolor{red}{(}}\existe[unalinea]{j}{\ent}{(0 \le j < i) \implicaLuego
-                \textbf{\textcolor{brown}{(}}transacciones[i].id\_comprador = transacciones[j].id\_vendedor\textbf{\textcolor{brown}{)}}}\textbf{\textcolor{red}{)}}\textbf{\textcolor{blue}{)}}}
+                \paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| \implicaLuego
+                \textbf{\textcolor{blue}{(}}\lnot perteneceUsuario(b.usuarios,\ transacciones[i].id\_comprador) \implicaLuego
+                \existe[unalinea]{j}{\ent}{0 \le j < i \yLuego
+                transacciones[i].id\_comprador = transacciones[j].id\_vendedor}\textbf{\textcolor{blue}{)}}}
             }
             \textcolor{babyblue}{/* Ningún usuario ya existente gasta más de lo que tiene (se verifica transacción a transacción) */} \\
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |b.usuario|) \implicaLuego
-            \textbf{\textcolor{blue}{(}}\paraTodo[unalinea]{j}{\ent}{
-                ((0 \le j < |transacciones|) \land (b.usuarios[i].id = transacciones[j].id\_comprador)) \implicaLuego
-                \textbf{\textcolor{red}{(}}
-                b.usuarios[i].monto + montoRecibido(transacciones,\ usuarios[i].id,\ j) - montoGastado(transacciones,\ usuarios[i].id,\ j)) \ge 0\textbf{\textcolor{red}{)}}}\textbf{\textcolor{blue}{)}}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |b.usuario| \implicaLuego
+            \paraTodo[unalinea]{j}{\ent}{
+                (0 \le j < |transacciones| \land_L b.usuarios[i].id = transacciones[j].id\_comprador) \implicaLuego
+                b.usuarios[i].monto + montoRecibido(transacciones,\ usuarios[i].id,\ j) - montoGastado(transacciones,\ usuarios[i].id,\ j) \ge 0}}
             }
             \textcolor{babyblue}{/* Verifica que ningún usuario nuevo gastó más de lo que adquirió */} \\
-            \requiere{\paraTodo[unalinea]{i}{\ent}{((0 \le i < |transacciones|) \land_L \\ (\lnot perteneceUsuario(b.usuarios, transacciones[i].id\_comprador))) \implicaLuego (montoRecibido(transacciones,\ transacciones[i].id\_comprador,\ i) - montoGastado(transacciones,\ transacciones[i].id\_comprador,\ i))}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones| \land_L \\ \lnot perteneceUsuario(b.usuarios, transacciones[i].id\_comprador)) \implicaLuego montoRecibido(transacciones,\ transacciones[i].id\_comprador,\ i) - montoGastado(transacciones,\ transacciones[i].id\_comprador,\ i) \ge 0}}
+
+            \textcolor{babyblue}{/* Todos los ids de los vendedores son mayores a 0 */} \\
+            \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| \implicaLuego transacciones[i].vendedor > 0}}
+            \textcolor{babyblue}{/* Todos los ids de los compradores son mayores a 0 excepto el primer comprador que depende de cada caso */} \\
+            \requiere{\paraTodo[unalinea]{i}{\ent}{1 \le i < |transacciones| \implicaLuego transacciones[i].comprador > 0}}
+
             \textcolor{babyblue}{/* El vendedor es algún usuario arbitrario siempre distinto para todas las operaciones de creación de berretacoin y además se emite una moneda en la primera transacción de cada bloque para los primeros 3000 bloques, y luego no se emitirán más monedas */} \\
             \requiere{
-                (|b.bloques| \le 3000) \implicaLuego \textbf{\textcolor{blue}{(}} \\
+                |b.bloques| < 3000 \implicaLuego \\
                 \setlength{\leftskip}{8em}
-                $(|transacciones| > 0)\ \land_L \\
-                (transacciones[0].id\_comprador = 0)\ \land_L \\
-                (transacciones[0].monto = 1)\ \land_L \\
-                (noGanoMonedaGratis(b.bloques, transacciones[0].id\_vendedor))\ \land_L \\
-                (transacciones[0].id\_vendedor $>$ 0) \land_L \\
-                (\paraTodo[unalinea]{i}{\ent}{(1 \le i < |transacciones|) \implicaLuego ((transacciones[i].id\_comprador \neq 0) \land_L$
-                    \\ \qquad (transacciones[i].id\_vendedor \neq 0)))}\\
-                \textbf{\textcolor{blue}{)}}
+                $|transacciones| > 0\ \land_L \\
+                transacciones[0].id\_comprador = 0\ \land_L \\
+                transacciones[0].monto = 1\ \land_L \\
+                noGanoMonedaGratis(b.bloques, transacciones[0].id\_vendedor)$
                 \\
                 \setlength{\leftskip}{5em}}
             \textcolor{babyblue}{/* Si ya se emitieron todas las berretacoin posibles, entonces no se seguirá emitiendo */} \\
-            \requiere{(|b.bloques| > 3000) \implicaLuego (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \implicaLuego ((transacciones[i].id\_comprador \neq 0) \land_L (transacciones[i].id\_vendedor \neq 0))})}
+            \requiere{|b.bloques| \ge 3000 \land |transacciones| > 0 \implicaLuego transacciones[0].id\_comprador > 0}
             \textcolor{babyblue}{/* El bloque nuevo se agrega a la lista de bloques de berretacoin */} \\
             \asegura{b.bloques = B_0 ++ \langle id\_bloque:|B_0.bloques|, transacciones:transacciones\rangle}
-            \textcolor{babyblue}{/* Todos los vendedores que están en transacciones y no están en $B_0.usuarios$, están en b.usuarios */} \\
+            \textcolor{babyblue}{/* Todos los usuarios que están en transacciones estan en b.usuarios */} \\
             \asegura{\paraTodo[unalinea]{i}{\ent}{
-                ((0 \leq i < |transacciones|) \yLuego \neg (perteneceUsuario(B_0.usuarios, transacciones[i].id\_vendedor))) \\
-                \implicaLuego (perteneceUsuario(b.usuarios, transacciones[i].id\_vendedor))
+                0 \leq i < |transacciones| \implicaLuego perteneceUsuario(b.usuarios, transacciones[i].id\_vendedor) \yLuego perteneceUsuario(b.usuarios, transacciones[i].id\_comprador)
                 }}
+            \textcolor{babyblue}{/* El orden de los usuarios sigue siendo el mismo orden en la lista */} \\
+            \asegura{\paraTodo[unalinea]{i}{\ent}{
+                0 \leq i < |B_{0}.usuarios| \implicaLuego b.usuarios[i].id = B_{0}.usuarios[i].id
+            }}
             \textcolor{babyblue}{/* No van a haber ids repetidos en b.usuarios */} \\
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \leq i < |b.usuarios|) \implicaLuego \neg (hayRepetidos(b.usuarios, b.usuarios[i]))}}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |b.usuarios| \implicaLuego \neg hayRepetidos(b.usuarios, b.usuarios[i])}}
             \textcolor{babyblue}{/* Actualizamos de ser necesario la cantidad de monedas de los usuarios */} \\
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \leq i < |b.usuarios|) \implicaLuego \bbig( \\
+            \asegura{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |b.usuarios| \implicaLuego \\
                 \setlength{\leftskip}{8em}
                 \textcolor{babyblue}{/* Caso: nuevo usuario y fue vendedor (previamente ya verificamos que sea vendedor antes que comprador, es decir que no gaste antes de tener) */} \\
-                \big((\neg (perteneceUsuario(B_0.usuarios, b.usuarios[i].id))) \land (vendedorPerteneceATransaccion(b.usuarios[i], transacciones)) \implicaLuego
-                    (b.usuarios[i].monedas = montoRecibido(transacciones, b.usuarios[i].id) - montoGastado(transacciones, b.usuario[i].id))\big) \\
+                \big((\neg perteneceUsuario(B_0.usuarios, b.usuarios[i].id) \land vendedorPerteneceATransaccion(b.usuarios[i], transacciones)) \implicaLuego
+                    b.usuarios[i].monedas = montoRecibido(transacciones, b.usuarios[i].id) - montoGastado(transacciones, b.usuario[i].id)\big) \\
                 \qquad \oLuego \\
-                \textcolor{babyblue}{/* Caso: era usuario y no recibio más monedas, es decir a lo sumo gastó */} \\
-                \big((perteneceUsuario(B_0.usuarios, b.usuarios[i].id)) \land ((\neg (vendedorPerteneceATransaccion(b.usuarios[i], transaccion))) \implicaLuego
-                    (b.usuarios[i].id = B_0.usuarios[i].id \land b.usuarios[i].monedas = B_0.usuarios[i].monto - montoGastado(transacciones, b.usuarios[i].id)))\big) \\
-                \qquad \oLuego \\
-                \textcolor{babyblue}{/* Caso: era usuario y recibió más monedas */} \\
-                \big((perteneceUsuario(B_0.usuarios, b.usuarios[i].id)) \land (vendedorPerteneceATransaccion(b.usuarios[i], transaccion)) \implicaLuego
-                    (b.usuarios[i].id = B_0.usuarios[i].id \land b.usuarios[i].monedas = B_0.usuarios[i].monedas + montoRecibido(transacciones, b.usuarios[i].id) - montoGastado(transacciones, b.usuarios[i].id))\big)\bbig)} \\
+                \textcolor{babyblue}{/* Caso: era usuario (previamente en los requiere ya verificamos que no gaste mas de lo que tenia transaccion a transaccion) */} \\
+                \big(perteneceUsuario(B_0.usuarios, b.usuarios[i].id) \implicaLuego
+                    b.usuarios[i].monedas = B_0.usuarios[i].monedas + montoRecibido(transacciones, b.usuarios[i].id) - montoGastado(transacciones, b.usuarios[i].id)\big)} \\
                 \textcolor{babyblue}{/* El caso de nuevo usuario y no fue vendedor no se contempla en el asegura pues o no sería un nuevo usuario o no cumple con los requiere */}
-            \\}
+            \\
+            \setlength{\leftskip}{5em}
+            }
         \end{proc} \} \par
         \vspace{0.5em}
 
         \begin{proc}{maximosTenedores}{\In b: Berretacoin}{\TLista{usuario}}
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |b|) \implicaLuego ((b.usuarios[i] \in res) \iff (esMaximoTenedor(b.usuarios, b.usuarios[i])))}}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{0 \le i < |b| \implicaLuego (b.usuarios[i] \in res \iff esMaximoTenedor(b.usuarios, b.usuarios[i]))}}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{0 \le i < |res| \implicaLuego \neg hayRepetidos(res, res[i])}}
         \end{proc} \} \par
         \vspace{0.5em}
 
@@ -186,18 +189,16 @@
             \asegura{|b.bloques| = 0 \implicaLuego res = 0}
             \asegura{cantTotalDeOperacionesBloques(b.bloques) = 0 \implicaLuego res = 0}
             \asegura{res = 
-                \big(montoTotalOperadoBloques(b.bloques) \big)
-                /
-                \big(cantTotalDeOperacionesBloques(b.bloques) \big)
+                montoTotalOperadoBloques(b.bloques)/cantTotalDeOperacionesBloques(b.bloques)
             }
         \end{proc} \} \par
         \vspace{0.5em}
 
         \begin{proc}{cotizacionAPesos}{\In b: Berretacoin, \In cotizaciones: \TLista{\ent}}{\TLista{\ent}}
             \requiere{ |cotizaciones| = |b.bloques| }
-            \requiere{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (cotizaciones[i] > 0)}}
-            \asegura{ |res| = |cotizaciones| }
-            \asegura{\paraTodo[unalinea]{i}{\ent}{(0 \le i < |cotizaciones|) \implicaLuego (res[i] = cotizaciones[i] * montoTotalOperado(b.bloques[i].transacciones))}}
+            \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |cotizaciones| \implicaLuego cotizaciones[i] > 0}}
+            \asegura{|res| = |cotizaciones|}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{0 \le i < |cotizaciones| \implicaLuego res[i] = cotizaciones[i] * montoTotalOperado(b.bloques[i].transacciones)}}
         \end{proc} \} \par
         \vspace{0.5em}
 
@@ -207,53 +208,53 @@
         \vspace{0.5em}
 
         \pred{nuevoUsuarioValido}{s: \TLista{usuario}, u: usuario}{
-            \qquad\quad (u.monedas = 0) \land (\paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (s[i].id \neq u.id)})
+            \qquad\quad u.monedas = 0 \land \paraTodo[unalinea]{i}{\ent}{0 \le i < |s| \implicaLuego s[i].id \neq u.id}
         }
         \vspace{0.5em}
 
         \pred{esMaximoTenedor}{s: \TLista{usuario}, u: usuario}{
-            \qquad\quad \paraTodo[unalinea]{i}{\ent}{(0 \le i < |s|) \implicaLuego (u.monedas \ge s[i].monedas)}
+            \qquad\quad \paraTodo[unalinea]{i}{\ent}{0 \le i < |s| \implicaLuego u.monedas \ge s[i].monedas}
         }
         \vspace{0.5em}
 
         \pred{perteneceUsuario}{s: \TLista{usuario}, id\_u: \ent}{
-            \qquad\quad \existe[unalinea]{i}{\ent}{(0 \le i < |s|) \land_{L} (s[i].id = id\_u)}
+            \qquad\quad \existe[unalinea]{i}{\ent}{0 \le i < |s| \land_{L} s[i].id = id\_u}
         }
         \vspace{0.5em}
 
         \pred{noGanoMonedaGratis}{bloques: \TLista{bloque}, id\_vendedor: \ent}{
-            \qquad\quad \paraTodo[unalinea]{i}{\ent}{(0 \le i < |bloques|) \implicaLuego (bloques[i].transacciones[0].id\_vendedor \neq id\_vendedor)}
+            \qquad\quad \paraTodo[unalinea]{i}{\ent}{0 \le i < |bloques| \implicaLuego bloques[i].transacciones[0].id\_vendedor \neq id\_vendedor}
         }
         \vspace{0.5em}
 
         \pred{vendedorPerteneceATransaccion}{usuario: usuario, transacciones: \TLista{transaccion}}{
-            \qquad\quad \existe[unalinea]{i}{\ent}{(0 \le i < |transacciones|) \yLuego (usuario.id = transacciones[i].id\_vendedor)}
+            \qquad\quad \existe[unalinea]{i}{\ent}{0 \le i < |transacciones| \yLuego usuario.id = transacciones[i].id\_vendedor}
         }
         \vspace{0.5em}
 
         \aux{montoRecibido}{transacciones: \TLista{transaccion}, id\_u: \ent, idx: \ent}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_vendedor = id\_u,\ transacciones[j].monto,\ 0)\right)}
+            \\ \qquad\quad \sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_vendedor = id\_u,\ transacciones[j].monto,\ 0)}
         \vspace{0.5em}
 
         \aux{montoGastado}{transacciones: \TLista{transaccion}, id\_u: \ent, idx: \ent}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_comprador = id\_u,\ transacciones[j].monto,\ 0)\right)}
+            \\ \qquad\quad \sum_{k=0}^{idx} ifThenElse(transacciones[k].id\_comprador = id\_u,\ transacciones[j].monto,\ 0)}
         \vspace{0.5em}
 
         \aux{montoTotalOperado}{transacciones: \TLista{transaccion}}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{|transacciones| - 1} transacciones[k].monto\right)}
+            \\ \qquad\quad \sum_{k=0}^{|transacciones| - 1} transacciones[k].monto}
         \vspace{0.5em}
 
         \aux{montoTotalOperadoBloques}{bloques: \TLista{bloque}}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{|bloques| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id\_bloque \leq 3000, 1, 0),
-                \\ \qquad\qquad\qquad b.bloques[k].transacciones))\Big)}
+            \\ \qquad\quad \sum_{k=0}^{|bloques| - 1} montoTotalOperado(transaccionesDesde(ifThenElse(b.bloques[k].id\_bloque \leq 3000, 1, 0),
+                \\ \qquad\qquad\qquad b.bloques[k].transacciones))}
         \vspace{0.5em}
 
         \aux{cantTotalDeOperacionesBloques}{bloques: \TLista{bloque}}{\ent}{
-            \\ \qquad\quad \left(\sum_{k=0}^{|bloques| - 1} |b.bloques[k].transacciones| - ifThenElse(b.bloques[k].id\_bloque \leq 3000, 1, 0)\right)}
+            \\ \qquad\quad \sum_{k=0}^{|bloques| - 1} |b.bloques[k].transacciones| - ifThenElse(b.bloques[k].id\_bloque \leq 3000, 1, 0)}
         \vspace{0.5em}
 
         \aux{transaccionesDesde}{indice: \ent, transacciones: \TLista{transaccion}}{\TLista{transaccion}}{
-            \\ \qquad\quad \left(subseq(transacciones, indice, |transacciones|)\right)}
+            \\ \qquad\quad $subseq(transacciones, indice, |transacciones|)$}
 
         \setlength{\leftskip}{0pt}\}
         \vspace{0.2cm}
