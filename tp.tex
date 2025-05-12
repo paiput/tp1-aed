@@ -116,6 +116,8 @@
             \requiere{transacciones = \langle\rangle \oLuego (transacciones[0].id = 0 \land \paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| - 1 \implicaLuego transacciones[i].id + 1 = transacciones[i+1].id})}
             \textcolor{babyblue}{/* Un usuario no puede ser comprador y vendedor a la vez en la misma transacción */} \\
             \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| \implicaLuego transacciones[i].id\_comprador \neq transacciones[i].id\_vendedor}}
+            \textcolor{babyblue}{/* Los montos de todas las transacciones son positivos */} \\
+            \requiere{\paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| \implicaLuego transacciones[i].monto > 0}}
             \textcolor{babyblue}{/* Si en transacciones aparece un comprador que no era usuario, el mismo debe aparecer como vendedor en alguna transacción previa*/} \\
             \requiere{
                 \paraTodo[unalinea]{i}{\ent}{0 \le i < |transacciones| \implicaLuego
@@ -166,11 +168,11 @@
                 \setlength{\leftskip}{8em}
                 \textcolor{babyblue}{/* Caso: nuevo usuario y fue vendedor (previamente ya verificamos que sea vendedor antes que comprador, es decir que no gaste antes de tener) */} \\
                 \big((\neg perteneceUsuario(B_0.usuarios, b.usuarios[i].id) \land vendedorPerteneceATransaccion(b.usuarios[i], transacciones)) \implicaLuego
-                    b.usuarios[i].monedas = montoRecibido(transacciones, b.usuarios[i].id) - montoGastado(transacciones, b.usuario[i].id)\big) \\
+                    b.usuarios[i].monedas = montoRecibido(transacciones, b.usuarios[i].id, |transacciones| - 1) - montoGastado(transacciones, b.usuario[i].id, |transacciones| - 1)\big) \\
                 \qquad \oLuego \\
                 \textcolor{babyblue}{/* Caso: era usuario (previamente en los requiere ya verificamos que no gaste mas de lo que tenia transaccion a transaccion) */} \\
                 \big(perteneceUsuario(B_0.usuarios, b.usuarios[i].id) \implicaLuego
-                    b.usuarios[i].monedas = B_0.usuarios[i].monedas + montoRecibido(transacciones, b.usuarios[i].id) - montoGastado(transacciones, b.usuarios[i].id)\big)} \\
+                    b.usuarios[i].monedas = B_0.usuarios[i].monedas + montoRecibido(transacciones, b.usuarios[i].id, |transacciones| - 1) - montoGastado(transacciones, b.usuarios[i].id, |transacciones| - 1)\big)} \\
                 \textcolor{babyblue}{/* El caso de nuevo usuario y no fue vendedor no se contempla en el asegura pues o no sería un nuevo usuario o no cumple con los requiere */}
             \\
             \setlength{\leftskip}{5em}
