@@ -181,7 +181,7 @@
         \vspace{0.5em}
 
         \begin{proc}{maximosTenedores}{\In b: Berretacoin}{\TLista{usuario}}
-            \asegura{\paraTodo[unalinea]{i}{\ent}{0 \le i < |b| \implicaLuego (b.usuarios[i] \in res \iff esMaximoTenedor(b.usuarios, b.usuarios[i]))}}
+            \asegura{\paraTodo[unalinea]{i}{\ent}{1 \le i < |b| \implicaLuego (b.usuarios[i] \in res \iff esMaximoTenedor(b.usuarios, b.usuarios[i]))}}
             \asegura{\paraTodo[unalinea]{i}{\ent}{0 \le i < |res| \implicaLuego \neg hayRepetidos(res, res[i])}}
         \end{proc} \} \par
         \vspace{0.5em}
